@@ -4,19 +4,19 @@ import inquirer from "inquirer";
 // View all employees
 const viewEmployees = async () => {
   const result = await pool.query("SELECT * FROM employee");
-  console.table("Employees:", result.rows);
+  console.table(result.rows); // Display the results as a table
 };
 
 // View all roles
 const viewRoles = async () => {
   const result = await pool.query("SELECT * FROM role");
-  console.table("Roles:", result.rows);
+  console.table(result.rows); // Display the results as a table
 };
 
 // View all departments
 const viewDepartments = async () => {
   const result = await pool.query("SELECT * FROM department");
-  console.table("Departments:", result.rows);
+  console.table(result.rows); // Display the results as a table
 };
 
 // Add an employee
@@ -36,9 +36,8 @@ const addEmployee = async () => {
 
   await pool.query(
     "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)",
-    [first_name, last_name, role_id, manager_id ? manager_id : null],
+    [first_name, last_name, role_id, manager_id || null],
   );
-
   console.log(`Employee '${first_name} ${last_name}' added successfully.`);
 };
 
