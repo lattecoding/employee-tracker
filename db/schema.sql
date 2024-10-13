@@ -25,28 +25,3 @@ CREATE TABLE employee (
     FOREIGN KEY (role_id) REFERENCES role(id),
     FOREIGN KEY (manager_id) REFERENCES employee(id) ON DELETE SET NULL
 );
-
--- Reset sequences to avoid duplicate key errors
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.sequences WHERE sequence_name = 'employee_id_seq') THEN
-        -- Set the sequence to the max id in the employee table
-        PERFORM setval('employee_id_seq', COALESCE((SELECT MAX(id) FROM employee), 0) + 1, false);
-    END IF;
-END $$;
-
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.sequences WHERE sequence_name = 'role_id_seq') THEN
-        -- Set the sequence to the max id in the role table
-        PERFORM setval('role_id_seq', COALESCE((SELECT MAX(id) FROM role), 0) + 1, false);
-    END IF;
-END $$;
-
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.sequences WHERE sequence_name = 'department_id_seq') THEN
-        -- Set the sequence to the max id in the department table
-        PERFORM setval('department_id_seq', COALESCE((SELECT MAX(id) FROM department), 0) + 1, false);
-    END IF;
-END $$;
