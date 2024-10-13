@@ -27,16 +27,27 @@ const addEmployee = async () => {
     value: role.id,
   }));
 
+  const employeesResult = await pool.query("SELECT * FROM employee");
+  const employees = employeesResult.rows.map((employee) => ({
+    name: `${employee.first_name} ${employee.last_name}`,
+    value: employee.id,
+  }));
+
   const { first_name, last_name, role_id, manager_id } = await inquirer.prompt([
     { name: "first_name", message: "Enter first name:" },
     { name: "last_name", message: "Enter last name:" },
     { name: "role_id", type: "list", message: "Select role:", choices: roles },
-    { name: "manager_id", message: "Enter manager ID (or leave blank):" },
+    {
+      name: "manager_id",
+      type: "list",
+      message: "Select manager (or select None):",
+      choices: [...employees, { name: "None", value: null }],
+    },
   ]);
 
   await pool.query(
     "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)",
-    [first_name, last_name, role_id, manager_id || null],
+    [first_name, last_name, role_id, manager_id],
   );
   console.log(`Employee '${first_name} ${last_name}' added successfully.`);
 };
@@ -120,9 +131,17 @@ const addDepartment = async () => {
 
 // Delete an employee
 const deleteEmployee = async () => {
+  const employeesResult = await pool.query("SELECT * FROM employee");
+  const employees = employeesResult.rows.map((employee) => ({
+    name: `${employee.first_name} ${employee.last_name}`,
+    value: employee.id,
+  }));
+
   const { id } = await inquirer.prompt({
     name: "id",
-    message: "Enter the ID of the employee to delete:",
+    type: "list",
+    message: "Select the employee to delete:",
+    choices: employees,
   });
 
   await pool.query("DELETE FROM employee WHERE id = $1", [id]);
